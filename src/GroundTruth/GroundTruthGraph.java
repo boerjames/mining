@@ -1,11 +1,13 @@
+package GroundTruth;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public class Graph {
+public class GroundTruthGraph {
     private Map<String, Set<String>> neighborList;
 
-    public Graph(String graphFile) {
+    public GroundTruthGraph(String graphFile) {
         neighborList = new HashMap<>();
         buildGraph(graphFile);
     }
@@ -38,7 +40,7 @@ public class Graph {
 
             scanner.close();
         } catch (FileNotFoundException e) {
-            System.err.println("Graph file not found!");
+            System.err.println("GroundTruth.GroundTruthGraph file not found!");
         }
 
     }
