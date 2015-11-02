@@ -5,22 +5,15 @@ import java.util.*;
 public class Graph {
     private Map<String, Set<String>> neighborList;
 
-    public Graph(String fileString) {
+    public Graph(String graphFile) {
         neighborList = new HashMap<>();
-        readFile(fileString);
-
-        for (String s : neighborList.keySet()) {
-            System.out.println(s);
-            for (String s1 : neighborList.get(s)) {
-                System.out.println("--> " + s1);
-            }
-        }
+        buildGraph(graphFile);
     }
 
-    private void readFile(String fileString) {
+    private void buildGraph(String graphFile) {
         Scanner scanner;
         try {
-            File file = new File(fileString);
+            File file = new File(graphFile);
             scanner = new Scanner(file);
 
             // add nodes to graph
@@ -45,7 +38,7 @@ public class Graph {
 
             scanner.close();
         } catch (FileNotFoundException e) {
-            System.err.println("File not found!");
+            System.err.println("Graph file not found!");
         }
 
     }
