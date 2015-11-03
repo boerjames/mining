@@ -17,6 +17,10 @@ public class AdjacencyListVertex extends Vertex {
         edges = new TreeSet<>();
     }
 
+    public SortedSet<Vertex> getEdges() {
+        return edges;
+    }
+
     public void addEdge(Vertex vertex) {
         edges.add(vertex);
     }
@@ -28,5 +32,4 @@ public class AdjacencyListVertex extends Vertex {
     public int getDegree() {
         return edges.size();
     }
-
 }

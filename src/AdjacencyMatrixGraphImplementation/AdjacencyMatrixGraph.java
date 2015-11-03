@@ -1,10 +1,8 @@
 package AdjacencyMatrixGraphImplementation;
 
-import AdjacencyListGraphImplementation.AdjacencyListVertex;
 import Graph.Graph;
 import Graph.Vertex;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -104,11 +102,11 @@ public class AdjacencyMatrixGraph implements Graph {
     public Vertex getVertex(int vectorID) {
         ArrayList<Vertex> sortedSet = new ArrayList<>();
         sortedSet.addAll(this.vertices);
-        Collections.sort(sortedSet, new VertexIDComparitor());
+        Collections.sort(sortedSet, new VertexIDComparator());
         return sortedSet.get(vectorID);
     }
 
-    class VertexIDComparitor implements Comparator<Vertex> {
+    class VertexIDComparator implements Comparator<Vertex> {
         @Override
         public int compare(Vertex adjacencyMatrixVertex1, Vertex adjacencyMatrixVertex2) {
             return ((AdjacencyMatrixVertex)adjacencyMatrixVertex1).getVertexID() - ((AdjacencyMatrixVertex)adjacencyMatrixVertex2).getVertexID();

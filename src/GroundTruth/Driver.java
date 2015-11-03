@@ -1,6 +1,6 @@
 package GroundTruth;
 
-public class Main {
+public class Driver {
 
     public static void main(String[] args) {
         GroundTruthGraph groundTruthGraph = new GroundTruthGraph("assignment5_data.txt");
