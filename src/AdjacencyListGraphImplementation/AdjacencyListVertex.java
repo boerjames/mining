@@ -2,6 +2,8 @@ package AdjacencyListGraphImplementation;
 
 import Graph.Vertex;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -10,14 +12,14 @@ import java.util.TreeSet;
  */
 public class AdjacencyListVertex extends Vertex {
 
-    SortedSet<Vertex> edges;
+    Set<Vertex> edges;
 
     public AdjacencyListVertex(String name) {
         super(name);
-        edges = new TreeSet<>();
+        edges = new HashSet<>();
     }
 
-    public SortedSet<Vertex> getEdges() {
+    public Set<Vertex> getEdges() {
         return edges;
     }
 
