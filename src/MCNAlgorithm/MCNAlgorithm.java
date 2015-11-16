@@ -8,13 +8,13 @@ import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
-import Cluster.Cluster;
+import Cluster.AdjacencyListCluster;
 import Graph.Vertex;
 
 
 public class MCNAlgorithm {
     private AdjacencyListGraph graph;
-    private Set<Cluster> clusters;
+    private Set<AdjacencyListCluster> clusters;
 
     public MCNAlgorithm(String file) {
         graph = new AdjacencyListGraph();
@@ -26,7 +26,7 @@ public class MCNAlgorithm {
 
         // to prepare, make each vertex into a cluster
         for (Vertex v : graph.getVertices()) {
-            Cluster c = new Cluster(v.getName());
+            AdjacencyListCluster c = new AdjacencyListCluster(v.getName());
             c.add((AdjacencyListVertex)v);
             clusters.add(c);
         }
@@ -34,15 +34,18 @@ public class MCNAlgorithm {
         // repeat 1 and 2 until no more clusters can be merged
         boolean mergePossible;
         double maxSimilarity;
+        int iteration = 0;
         do {
+            System.out.println("Iteration: " + (++iteration));
+            System.out.println("Num clusters: " + clusters.size());
             mergePossible = false;
             maxSimilarity = 0.0;
-            Cluster max1 = null;
-            Cluster max2 = null;
+            AdjacencyListCluster max1 = null;
+            AdjacencyListCluster max2 = null;
 
             // 1. find the most similar vertices from different clusters based on a similarity function
-            for (Cluster c1 : clusters) {
-                for (Cluster c2 : clusters) {
+            for (AdjacencyListCluster c1 : clusters) {
+                for (AdjacencyListCluster c2 : clusters) {
                     if (c1.equals(c2)) continue;
 
                     double similarity = c1.similarity(c2, "jaccard");
@@ -58,7 +61,10 @@ public class MCNAlgorithm {
 
             // 2. merge the two clusters if the merged cluster reaches a density threshold
             if (mergePossible) {
-                Cluster merge = new Cluster(max1, max2);
+                System.out.println("Merging: " + max1.toString() + " and " + max2.toString());
+                AdjacencyListCluster merge = new AdjacencyListCluster(max1, max2);
+                System.out.println("Result: " + merge.toString());
+                System.out.println();
                 clusters.add(merge);
                 clusters.remove(max1);
                 clusters.remove(max2);
@@ -66,6 +72,16 @@ public class MCNAlgorithm {
 
         } while (mergePossible);
 
+    }
+
+    public void print() {
+        System.out.println(clusters.size());
+        for (AdjacencyListCluster c : clusters) {
+            System.out.print(c.getName() + " [" + c.getCluster().size() + "]");
+            for (AdjacencyListVertex s : c.getCluster()) {
+                System.out.println(" " + s.getName());
+            }
+        }
     }
 
     private void getInput(String fileString) {

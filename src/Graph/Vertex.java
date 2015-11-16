@@ -7,8 +7,6 @@ public abstract class Vertex implements Comparable<Vertex> {
 
     private String name;
 
-    public Vertex() {}
-
     public Vertex(String name) {
         this.name = name;
     }
@@ -22,5 +20,21 @@ public abstract class Vertex implements Comparable<Vertex> {
     @Override
     public int compareTo(Vertex vertex) {
         return name.compareTo(vertex.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Vertex vertex = (Vertex) o;
+
+        return name.equals(vertex.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

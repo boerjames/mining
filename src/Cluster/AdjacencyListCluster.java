@@ -1,24 +1,23 @@
 package Cluster;
 
-import AdjacencyListGraphImplementation.AdjacencyListGraph;
 import AdjacencyListGraphImplementation.AdjacencyListVertex;
 import Graph.Vertex;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Cluster {
+public class AdjacencyListCluster {
 
     private final String name;
     private final Set<AdjacencyListVertex> cluster;
 
-    public Cluster(String name) {
+    public AdjacencyListCluster(String name) {
         this.name = name;
         this.cluster = new HashSet<>();
     }
 
-    public Cluster(Cluster c1, Cluster c2) {
-        this.name = c1.getName();
+    public AdjacencyListCluster(AdjacencyListCluster c1, AdjacencyListCluster c2) {
+        this.name = c1.getName() + " " + c2.getName();
         this.cluster = new HashSet<>(c1.getCluster());
         this.cluster.addAll(c2.getCluster());
     }
@@ -52,7 +51,7 @@ public class Cluster {
         return neighbors;
     }
 
-    public double similarity(Cluster other, String method) {
+    public double similarity(AdjacencyListCluster other, String method) {
         Set<AdjacencyListVertex> neighbors = this.getNeighbors();
         Set<AdjacencyListVertex> otherNeighbors = other.getNeighbors();
 
@@ -77,11 +76,20 @@ public class Cluster {
         }
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (AdjacencyListVertex v : cluster) {
+            sb.append(v.getName() + " ");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Cluster cluster = (Cluster) o;
+        AdjacencyListCluster cluster = (AdjacencyListCluster) o;
         return name.equals(cluster.name);
 
     }
