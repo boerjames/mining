@@ -3,10 +3,12 @@ package MBSPLAlgorithm;
 import AdjacencyMatrixGraphImplementation.AdjacencyMatrixVertex;
 import Graph.Vertex;
 
+import java.io.Serializable;
+
 /**
  * Created by CONNER on 11/2/2015.
  */
-public class MBSPLVertexVertexDistance implements Comparable<MBSPLVertexVertexDistance>{
+public class MBSPLVertexVertexDistance implements Comparable<MBSPLVertexVertexDistance>, Serializable{
 
     private AdjacencyMatrixVertex vertex1, vertex2;
     private int distance;

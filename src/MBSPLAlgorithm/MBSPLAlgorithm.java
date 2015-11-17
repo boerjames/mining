@@ -5,10 +5,8 @@ import AdjacencyMatrixGraphImplementation.AdjacencyMatrixVertex;
 import Cluster.Cluster;
 import Graph.Vertex;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.Buffer;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
@@ -28,13 +26,32 @@ public class MBSPLAlgorithm {
         graph = new AdjacencyMatrixGraph();
         distances = new TreeSet<>();
         this.getInput(dataFile);
-        dijkstra();
+        clusters = new TreeSet<>();
+        File file = new File("shortest-paths.txt");
+        if(!file.exists()) {
+            file.createNewFile();
+            floydWershall();
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
+            ObjectOutput objectOutput = new ObjectOutputStream(bufferedOutputStream);
+            for(MBSPLVertexVertexDistance mbsplVertexVertexDistance : distances) {
+                objectOutput.writeObject(mbsplVertexVertexDistance);
+            }
+            objectOutput.flush();
+        } else {
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+            ObjectInput objectInput = new ObjectInputStream(bufferedInputStream);
+            try {
+                MBSPLVertexVertexDistance distance;
+                while((distance = (MBSPLVertexVertexDistance) objectInput.readObject()) != null)
+                    distances.add(distance);
+            } catch (ClassNotFoundException e) {}
+        }
     }
 
     public void run() {
         int clusterid = 0;
 
-        while(distances.size() > 0 || distances.first().getDistance() > THRESHOLD) {
+        while(distances.size() > 0 && distances.first().getDistance() > THRESHOLD) {
 
             MBSPLVertexVertexDistance mbsplVertexVertexDistance = distances.first();
             distances.remove(mbsplVertexVertexDistance);
@@ -106,7 +123,17 @@ public class MBSPLAlgorithm {
 //            }
 //        }
 
+        for(ArrayList<Integer> integers : distances) {
+            integers.replaceAll(new UnaryOperator<Integer>() {
+                @Override
+                public Integer apply(Integer integer) {
+                    return integer == 0 ? Integer.MAX_VALUE : integer;
+                }
+            });
+        }
+
         for(int k = 0;  k < distances.size(); k++) {
+            System.out.println(k);
             for(int i = 0; i < distances.size(); i++) {
                 for(int j = 0; j < distances.size(); j++) {
                     if(distances.get(i).get(j) > distances.get(i).get(k) + distances.get(k).get(j)) {
@@ -117,66 +144,68 @@ public class MBSPLAlgorithm {
         }
 
         for(int i = 0; i < graph.getVertices().size(); i++) {
-            for(int j = 0; j < graph.getVertices().size(); j++) {
-                this.distances.add(new MBSPLVertexVertexDistance((AdjacencyMatrixVertex)graph.getVertex(i),
+            System.out.println(i);
+            for(int j = i+1; j < graph.getVertices().size(); j++) {
+                if(distances.get(i).get(j) > 0)
+                    this.distances.add(new MBSPLVertexVertexDistance((AdjacencyMatrixVertex)graph.getVertex(i),
                         (AdjacencyMatrixVertex)graph.getVertex(j), distances.get(i).get(j)));
             }
         }
 
     }
 
-    private void dijkstra() {
-
-        ArrayList<ArrayList<Integer>> distances = new ArrayList<>(graph.getAdjacencyMatrix());
-
-        for(ArrayList<Integer> integers : distances) {
-            integers.replaceAll(new UnaryOperator<Integer>() {
-                @Override
-                public Integer apply(Integer integer) {
-                    return integer == 0 ? Integer.MAX_VALUE : integer;
-                }
-            });
-        }
-
-
-
-
-        for (int i = 0; i < distances.size(); i++) {
-            final int fin = i;
-            SortedSet<Integer> q = new TreeSet<>(new Comparator<Integer>(){
-                @Override
-                public int compare(Integer o1, Integer o2) {
-                    return distances.get(fin).get(o1) - distances.get(fin).get(o2);
-                }
-            });
-
-            q.addAll(distances.get(i));
-
-            distances.get(i).set(i, 0);
-
-            while(q.size() > 0) {
-                int vertex = q.first();
-                q.remove(vertex);
-
-                for(int neighbor : distances.get(vertex)) {
-                    int alt = distances.get(i).get(vertex);
-                    if(alt < distances.get(i).get(neighbor)) {
-                        distances.get(i).set(neighbor, alt);
-                    }
-                }
-            }
-
-        }
-
-        for(int i = 0; i < graph.getVertices().size(); i++) {
-            for(int j = 0; j < graph.getVertices().size(); j++) {
-                this.distances.add(new MBSPLVertexVertexDistance((AdjacencyMatrixVertex)graph.getVertex(i),
-                        (AdjacencyMatrixVertex)graph.getVertex(j), distances.get(i).get(j)));
-            }
-        }
-
-
-    }
+//    private void dijkstra() {
+//
+//        ArrayList<ArrayList<Integer>> distances = new ArrayList<>(graph.getAdjacencyMatrix());
+//
+//        for(ArrayList<Integer> integers : distances) {
+//            integers.replaceAll(new UnaryOperator<Integer>() {
+//                @Override
+//                public Integer apply(Integer integer) {
+//                    return integer == 0 ? Integer.MAX_VALUE : integer;
+//                }
+//            });
+//        }
+//
+//
+//
+//
+//        for (int i = 0; i < distances.size(); i++) {
+//            final int fin = i;
+//            SortedSet<Integer> q = new TreeSet<>(new Comparator<Integer>(){
+//                @Override
+//                public int compare(Integer o1, Integer o2) {
+//                    return distances.get(fin).get(o1) - distances.get(fin).get(o2);
+//                }
+//            });
+//
+//            q.addAll(distances.get(i));
+//
+//            distances.get(i).set(i, 0);
+//
+//            while(q.size() > 0) {
+//                int vertex = q.first();
+//                q.remove(vertex);
+//
+//                for(int neighbor : distances.get(vertex)) {
+//                    int alt = distances.get(i).get(vertex);
+//                    if(alt < distances.get(i).get(neighbor)) {
+//                        distances.get(i).set(neighbor, alt);
+//                    }
+//                }
+//            }
+//
+//        }
+//
+//        for(int i = 0; i < graph.getVertices().size(); i++) {
+//            for(int j = 0; j < graph.getVertices().size(); j++) {
+//                this.distances.add(new MBSPLVertexVertexDistance((AdjacencyMatrixVertex)graph.getVertex(i),
+//                        (AdjacencyMatrixVertex)graph.getVertex(j), distances.get(i).get(j)));
+//            }
+//        }
+//
+//
+//    }
 
     private void getInput(File dataFile) throws IOException {
 
