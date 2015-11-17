@@ -1,5 +1,6 @@
-package GroundTruth;
+package Cluster;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +17,8 @@ public class Cluster<T> {
     public void add(T item) {
         cluster.add(item);
     }
+
+    public void addAll(Collection<T> items) {cluster.addAll(items);}
 
     public String getName() {
         return name;

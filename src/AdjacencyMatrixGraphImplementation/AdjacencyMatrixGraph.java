@@ -48,10 +48,19 @@ public class AdjacencyMatrixGraph implements Graph {
             this.vertices.add(adjacencyMatrixVertex);
 
             for(ArrayList<Integer> arrayList : this.adjacencyMatrix) {
-                arrayList.add(0);
+                arrayList.add(Integer.MAX_VALUE);
             }
 
-            adjacencyMatrix.add(new ArrayList<>(this.vertices.size()));
+            ArrayList<Integer> arrayList = new ArrayList<>();
+            for(Vertex vertex1 : vertices) {
+                if(arrayList.size()-1 == adjacencyMatrixVertex.getVertexID()) {
+                    arrayList.add(0);
+                } else {
+                    arrayList.add(Integer.MAX_VALUE);
+                }
+
+            }
+            adjacencyMatrix.add(arrayList);
         }
     }
 
@@ -104,6 +113,10 @@ public class AdjacencyMatrixGraph implements Graph {
         sortedSet.addAll(this.vertices);
         Collections.sort(sortedSet, new VertexIDComparator());
         return sortedSet.get(vectorID);
+    }
+
+    public ArrayList<ArrayList<Integer>> getAdjacencyMatrix() {
+        return adjacencyMatrix;
     }
 
     class VertexIDComparator implements Comparator<Vertex> {
