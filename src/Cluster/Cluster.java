@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Cluster<T> {
+public class Cluster<T> implements Comparable<Cluster<T>>{
 
     private final String name;
     private final Set<T> cluster;
@@ -26,6 +26,11 @@ public class Cluster<T> {
 
     public Set<T> getCluster() {
         return cluster;
+    }
+
+    @Override
+    public int compareTo(Cluster<T> cluster) {
+        return name.compareTo(cluster.getName());
     }
 
     @Override

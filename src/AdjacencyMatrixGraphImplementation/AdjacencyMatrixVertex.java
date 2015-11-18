@@ -2,10 +2,12 @@ package AdjacencyMatrixGraphImplementation;
 
 import Graph.Vertex;
 
+import java.io.Serializable;
+
 /**
  * Created by CONNER on 11/2/2015.
  */
-public class AdjacencyMatrixVertex extends Vertex {
+public class AdjacencyMatrixVertex extends Vertex implements Serializable {
 
     private int vertexID;
 

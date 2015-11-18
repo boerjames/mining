@@ -15,7 +15,7 @@ import java.util.function.UnaryOperator;
  */
 public class MBSPLAlgorithm {
 
-    private static final double THRESHOLD = 5;
+    private static final double THRESHOLD = 6;
 
     private AdjacencyMatrixGraph graph;
     private SortedSet<MBSPLVertexVertexDistance> distances;
@@ -27,6 +27,7 @@ public class MBSPLAlgorithm {
         distances = new TreeSet<>();
         this.getInput(dataFile);
         clusters = new TreeSet<>();
+        vertexClusterID = new HashMap<>();
         File file = new File("shortest-paths.txt");
         if(!file.exists()) {
             file.createNewFile();
@@ -42,8 +43,10 @@ public class MBSPLAlgorithm {
             ObjectInput objectInput = new ObjectInputStream(bufferedInputStream);
             try {
                 MBSPLVertexVertexDistance distance;
-                while((distance = (MBSPLVertexVertexDistance) objectInput.readObject()) != null)
-                    distances.add(distance);
+                try {
+                    while ((distance = (MBSPLVertexVertexDistance) objectInput.readObject()) != null)
+                        distances.add(distance);
+                } catch (EOFException e) {}
             } catch (ClassNotFoundException e) {}
         }
     }
@@ -51,7 +54,7 @@ public class MBSPLAlgorithm {
     public void run() {
         int clusterid = 0;
 
-        while(distances.size() > 0 && distances.first().getDistance() > THRESHOLD) {
+        while(distances.size() > 0 && distances.first().getDistance() <= THRESHOLD) {
 
             MBSPLVertexVertexDistance mbsplVertexVertexDistance = distances.first();
             distances.remove(mbsplVertexVertexDistance);
@@ -64,14 +67,17 @@ public class MBSPLAlgorithm {
             } if(vertexClusterID.containsKey(mbsplVertexVertexDistance.getVertex2())) {
                 cluster2 = getClusterByID(vertexClusterID.get(mbsplVertexVertexDistance.getVertex2()));
             }
+            //Check if clusters are the same.
 
             if(cluster1 != null) {
 
-                if (cluster2 != null) {
+                if (cluster2 != null && cluster1.compareTo(cluster2) != 0) {
                     cluster1.addAll(cluster2.getCluster());
                     for(AdjacencyMatrixVertex vertex : cluster2.getCluster()) {
                         vertexClusterID.put(vertex, cluster1.getName());
                     }
+
+                    clusters.remove(cluster2);
                 } else {
                     cluster1.add(mbsplVertexVertexDistance.getVertex2());
                     vertexClusterID.put(mbsplVertexVertexDistance.getVertex2(), cluster1.getName());
@@ -87,6 +93,8 @@ public class MBSPLAlgorithm {
                 cluster1.add(mbsplVertexVertexDistance.getVertex1());
                 cluster1.add(mbsplVertexVertexDistance.getVertex2());
 
+                clusters.add(cluster1);
+
                 vertexClusterID.put(mbsplVertexVertexDistance.getVertex2(), cluster1.getName());
                 vertexClusterID.put(mbsplVertexVertexDistance.getVertex1(), cluster1.getName());
 
@@ -94,7 +102,9 @@ public class MBSPLAlgorithm {
             }
         }
 
-        for(Cluster<AdjacencyMatrixVertex> cluster : clusters) {
+        SortedSet<Cluster<AdjacencyMatrixVertex>> clusters1 = new TreeSet<>();
+        clusters1.addAll(clusters);
+        for(Cluster<AdjacencyMatrixVertex> cluster : clusters1) {
             if (cluster.getCluster().size() < 3) {
                 clusters.remove(cluster);
             }
@@ -136,76 +146,28 @@ public class MBSPLAlgorithm {
             System.out.println(k);
             for(int i = 0; i < distances.size(); i++) {
                 for(int j = 0; j < distances.size(); j++) {
-                    if(distances.get(i).get(j) > distances.get(i).get(k) + distances.get(k).get(j)) {
-                        distances.get(i).set(j, distances.get(i).get(k) + distances.get(k).get(j));
-                    }
+                    if(distances.get(i).get(k) != Integer.MAX_VALUE && distances.get(k).get(j) != Integer.MAX_VALUE)
+                        if(distances.get(i).get(j) > distances.get(i).get(k) + distances.get(k).get(j)) {
+                            distances.get(i).set(j, distances.get(i).get(k) + distances.get(k).get(j));
+                        }
                 }
             }
         }
 
+        convertDistances(distances);
+
+    }
+
+    private void convertDistances(ArrayList<ArrayList<Integer>> distances) {
         for(int i = 0; i < graph.getVertices().size(); i++) {
             System.out.println(i);
             for(int j = i+1; j < graph.getVertices().size(); j++) {
                 if(distances.get(i).get(j) > 0)
                     this.distances.add(new MBSPLVertexVertexDistance((AdjacencyMatrixVertex)graph.getVertex(i),
-                        (AdjacencyMatrixVertex)graph.getVertex(j), distances.get(i).get(j)));
+                            (AdjacencyMatrixVertex)graph.getVertex(j), distances.get(i).get(j)));
             }
         }
-
     }
-
-//    private void dijkstra() {
-//
-//        ArrayList<ArrayList<Integer>> distances = new ArrayList<>(graph.getAdjacencyMatrix());
-//
-//        for(ArrayList<Integer> integers : distances) {
-//            integers.replaceAll(new UnaryOperator<Integer>() {
-//                @Override
-//                public Integer apply(Integer integer) {
-//                    return integer == 0 ? Integer.MAX_VALUE : integer;
-//                }
-//            });
-//        }
-//
-//
-//
-//
-//        for (int i = 0; i < distances.size(); i++) {
-//            final int fin = i;
-//            SortedSet<Integer> q = new TreeSet<>(new Comparator<Integer>(){
-//                @Override
-//                public int compare(Integer o1, Integer o2) {
-//                    return distances.get(fin).get(o1) - distances.get(fin).get(o2);
-//                }
-//            });
-//
-//            q.addAll(distances.get(i));
-//
-//            distances.get(i).set(i, 0);
-//
-//            while(q.size() > 0) {
-//                int vertex = q.first();
-//                q.remove(vertex);
-//
-//                for(int neighbor : distances.get(vertex)) {
-//                    int alt = distances.get(i).get(vertex);
-//                    if(alt < distances.get(i).get(neighbor)) {
-//                        distances.get(i).set(neighbor, alt);
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        for(int i = 0; i < graph.getVertices().size(); i++) {
-//            for(int j = 0; j < graph.getVertices().size(); j++) {
-//                this.distances.add(new MBSPLVertexVertexDistance((AdjacencyMatrixVertex)graph.getVertex(i),
-//                        (AdjacencyMatrixVertex)graph.getVertex(j), distances.get(i).get(j)));
-//            }
-//        }
-//
-//
-//    }
 
     private void getInput(File dataFile) throws IOException {
 
@@ -225,9 +187,17 @@ public class MBSPLAlgorithm {
 
     @Override
     public String toString() {
-        String ret = clusters.size() + "\n";
+        SortedSet<Cluster<AdjacencyMatrixVertex>> clusters1 = new TreeSet<>(new Comparator<Cluster>() {
+            @Override
+            public int compare(Cluster o1, Cluster o2) {
+                return o1.getCluster().size() == o2.getCluster().size() ? o1.getName().compareTo(o2.getName()) :
+                        o2.getCluster().size() - o1.getCluster().size();
+            }
+        });
+        clusters1.addAll(clusters);
+        String ret = clusters1.size() + "\n";
 
-        for (Cluster<AdjacencyMatrixVertex> cluster : clusters) {
+        for (Cluster<AdjacencyMatrixVertex> cluster : clusters1) {
 
             ret += cluster.getCluster().size();
 

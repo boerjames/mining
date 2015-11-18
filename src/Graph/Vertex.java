@@ -1,9 +1,11 @@
 package Graph;
 
+import java.io.Serializable;
+
 /**
  * Created by CONNER on 11/2/2015.
  */
-public abstract class Vertex implements Comparable<Vertex> {
+public abstract class Vertex implements Comparable<Vertex>, Serializable{
 
     private String name;
 

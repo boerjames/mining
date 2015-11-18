@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+import Cluster.Cluster;
+
 public class GroundTruth {
     private Set<Cluster> groundTruth;
 
