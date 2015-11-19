@@ -119,6 +119,16 @@ public class AdjacencyMatrixGraph implements Graph {
         return adjacencyMatrix;
     }
 
+    public Set<AdjacencyMatrixVertex> getEdges(AdjacencyMatrixVertex vertex) {
+        Set<AdjacencyMatrixVertex> edges = new HashSet<>();
+        for(int i = 0; i < adjacencyMatrix.get(vertex.getVertexID()).size(); i++) {
+            if(adjacencyMatrix.get(vertex.getVertexID()).get(i) == 1) {
+                edges.add((AdjacencyMatrixVertex)getVertex(i));
+            }
+        }
+        return edges;
+    }
+
     class VertexIDComparator implements Comparator<Vertex> {
         @Override
         public int compare(Vertex adjacencyMatrixVertex1, Vertex adjacencyMatrixVertex2) {

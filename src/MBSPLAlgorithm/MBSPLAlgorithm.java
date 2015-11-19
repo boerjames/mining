@@ -6,6 +6,7 @@ import Cluster.Cluster;
 import Graph.Vertex;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.Buffer;
 import java.util.*;
 import java.util.function.UnaryOperator;
@@ -21,6 +22,7 @@ public class MBSPLAlgorithm {
     private SortedSet<MBSPLVertexVertexDistance> distances;
     private SortedSet<Cluster<AdjacencyMatrixVertex>> clusters;
     private Map<AdjacencyMatrixVertex, String> vertexClusterID;
+    private int clusterid;
 
     public MBSPLAlgorithm(File dataFile) throws IOException {
         graph = new AdjacencyMatrixGraph();
@@ -28,10 +30,11 @@ public class MBSPLAlgorithm {
         this.getInput(dataFile);
         clusters = new TreeSet<>();
         vertexClusterID = new HashMap<>();
+        clusterid = 0;
         File file = new File("shortest-paths.txt");
         if(!file.exists()) {
             file.createNewFile();
-            floydWershall();
+            floydWershall(this.graph);
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
             ObjectOutput objectOutput = new ObjectOutputStream(bufferedOutputStream);
             for(MBSPLVertexVertexDistance mbsplVertexVertexDistance : distances) {
@@ -52,7 +55,6 @@ public class MBSPLAlgorithm {
     }
 
     public void run() {
-        int clusterid = 0;
 
         while(distances.size() > 0 && distances.first().getDistance() <= THRESHOLD) {
 
@@ -125,7 +127,43 @@ public class MBSPLAlgorithm {
         return cluster;
     }
 
-    private void floydWershall() {
+    public static double getTHRESHOLD() {
+        return THRESHOLD;
+    }
+
+    public AdjacencyMatrixGraph getGraph() {
+        return graph;
+    }
+
+    public void setGraph(AdjacencyMatrixGraph graph) {
+        this.graph = graph;
+    }
+
+    public SortedSet<MBSPLVertexVertexDistance> getDistances() {
+        return distances;
+    }
+
+    public void setDistances(SortedSet<MBSPLVertexVertexDistance> distances) {
+        this.distances = distances;
+    }
+
+    public SortedSet<Cluster<AdjacencyMatrixVertex>> getClusters() {
+        return clusters;
+    }
+
+    public void setClusters(SortedSet<Cluster<AdjacencyMatrixVertex>> clusters) {
+        this.clusters = clusters;
+    }
+
+    public Map<AdjacencyMatrixVertex, String> getVertexClusterID() {
+        return vertexClusterID;
+    }
+
+    public void setVertexClusterID(Map<AdjacencyMatrixVertex, String> vertexClusterID) {
+        this.vertexClusterID = vertexClusterID;
+    }
+
+    public ArrayList<ArrayList<Integer>> floydWershall(AdjacencyMatrixGraph graph) {
         ArrayList<ArrayList<Integer>> distances = new ArrayList<>(graph.getAdjacencyMatrix());
 
 //        for(int i = 0; i < graph.getVertices().size(); i++) {
@@ -157,6 +195,7 @@ public class MBSPLAlgorithm {
 
         convertDistances(distances);
 
+        return distances;
     }
 
     private void convertDistances(ArrayList<ArrayList<Integer>> distances) {
@@ -167,6 +206,14 @@ public class MBSPLAlgorithm {
                             (AdjacencyMatrixVertex)graph.getVertex(j), distances.get(i).get(j)));
             }
         }
+    }
+
+    public int getClusterid() {
+        return clusterid;
+    }
+
+    public void setClusterid(int clusterid) {
+        this.clusterid = clusterid;
     }
 
     private void getInput(File dataFile) throws IOException {
