@@ -15,7 +15,7 @@ import java.util.function.UnaryOperator;
  */
 public class MBSPLAlgorithm {
 
-    private static final double THRESHOLD = 6;
+    private static final double THRESHOLD = 5;
 
     private AdjacencyMatrixGraph graph;
     private SortedSet<MBSPLVertexVertexDistance> distances;
@@ -100,6 +100,8 @@ public class MBSPLAlgorithm {
 
                 clusterid++;
             }
+
+            // TODO Minnimum Cut Here
         }
 
         SortedSet<Cluster<AdjacencyMatrixVertex>> clusters1 = new TreeSet<>();
@@ -143,7 +145,6 @@ public class MBSPLAlgorithm {
         }
 
         for(int k = 0;  k < distances.size(); k++) {
-            System.out.println(k);
             for(int i = 0; i < distances.size(); i++) {
                 for(int j = 0; j < distances.size(); j++) {
                     if(distances.get(i).get(k) != Integer.MAX_VALUE && distances.get(k).get(j) != Integer.MAX_VALUE)
@@ -160,7 +161,6 @@ public class MBSPLAlgorithm {
 
     private void convertDistances(ArrayList<ArrayList<Integer>> distances) {
         for(int i = 0; i < graph.getVertices().size(); i++) {
-            System.out.println(i);
             for(int j = i+1; j < graph.getVertices().size(); j++) {
                 if(distances.get(i).get(j) > 0)
                     this.distances.add(new MBSPLVertexVertexDistance((AdjacencyMatrixVertex)graph.getVertex(i),
