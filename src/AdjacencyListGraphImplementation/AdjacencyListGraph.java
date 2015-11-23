@@ -15,22 +15,18 @@ public class AdjacencyListGraph implements Graph {
 
     Set<Vertex> vertices = new TreeSet<>();
 
-    // TODO implement
     public Set<Vertex> getVertices(){
         return vertices;
     }
 
-    // TODO implement
     public void addVertices(Set<Vertex> vertices){
         this.vertices.addAll(vertices);
     }
 
-    // TODO implement
     public void addVertex(Vertex vertex){
         vertices.add(vertex);
     }
 
-    // TODO implement
     public void removeVertex(Vertex vertex){
         vertices.remove(vertex);
 
@@ -39,7 +35,6 @@ public class AdjacencyListGraph implements Graph {
         }
     }
 
-    // TODO implement
     public void addEdge(Vertex vertex1, Vertex vertex2){
         if(!vertices.contains(vertex1)) {
             this.addVertex(vertex1);
@@ -57,7 +52,6 @@ public class AdjacencyListGraph implements Graph {
         ((AdjacencyListVertex)vertex2).addEdge(vertex1);
     }
 
-    // TODO implement
     public void removeEdge(Vertex vertex1, Vertex vertex2){
         if(vertices.contains(vertex1)) {
             ((AdjacencyListVertex)((SortedSet<Vertex>)vertices).tailSet(vertex1).first()).removeEdge(vertex2);

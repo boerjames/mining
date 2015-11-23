@@ -3,7 +3,6 @@ package GroundTruth;
 public class Driver {
 
     public static void main(String[] args) {
-        GroundTruthGraph groundTruthGraph = new GroundTruthGraph("assignment5_data.txt");
-        GroundTruth groundTruth = new GroundTruth("complex_merged.txt");
+        GroundTruth groundTruth = new GroundTruth("assignment5_data.txt", "complex_merged.txt");
     }
 }

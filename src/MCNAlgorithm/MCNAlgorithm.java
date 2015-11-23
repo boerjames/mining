@@ -5,6 +5,7 @@ import AdjacencyListGraphImplementation.AdjacencyListVertex;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -13,6 +14,7 @@ import Graph.Vertex;
 
 
 public class MCNAlgorithm {
+    private int clusterID = 0;
     private AdjacencyListGraph graph;
     private Set<AdjacencyListCluster> clusters;
 
@@ -26,7 +28,7 @@ public class MCNAlgorithm {
 
         // to prepare, make each vertex into a cluster
         for (Vertex v : graph.getVertices()) {
-            AdjacencyListCluster c = new AdjacencyListCluster(v.getName());
+            AdjacencyListCluster c = new AdjacencyListCluster(clusterID++);
             c.add((AdjacencyListVertex)v);
             clusters.add(c);
         }
@@ -61,10 +63,7 @@ public class MCNAlgorithm {
 
             // 2. merge the two clusters if the merged cluster reaches a density threshold
             if (mergePossible) {
-                System.out.println("Merging: " + max1.toString() + " and " + max2.toString());
-                AdjacencyListCluster merge = new AdjacencyListCluster(max1, max2);
-                System.out.println("Result: " + merge.toString());
-                System.out.println();
+                AdjacencyListCluster merge = new AdjacencyListCluster(clusterID++, max1, max2);
                 clusters.add(merge);
                 clusters.remove(max1);
                 clusters.remove(max2);
@@ -77,11 +76,32 @@ public class MCNAlgorithm {
     public void print() {
         System.out.println(clusters.size());
         for (AdjacencyListCluster c : clusters) {
-            System.out.print(c.getName() + " [" + c.getCluster().size() + "]");
+            System.out.print(c.getID() + " [" + c.getCluster().size() + "]");
             for (AdjacencyListVertex s : c.getCluster()) {
                 System.out.println(" " + s.getName());
             }
         }
+    }
+
+    public void save() {
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter("mcn_results.txt");
+
+            // print out the clusters
+            for (AdjacencyListCluster cluster : clusters) {
+                for (Vertex vertex : cluster.getCluster()) {
+                    writer.print(" " + vertex.getName());
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("oh no");
+        }
+    }
+
+    public Set<AdjacencyListCluster> getClusters() {
+        return clusters;
     }
 
     private void getInput(String fileString) {

@@ -8,26 +8,22 @@ import java.util.Set;
 
 public class AdjacencyListCluster {
 
-    private final String name;
+    private final Integer id;
     private final Set<AdjacencyListVertex> cluster;
 
-    public AdjacencyListCluster(String name) {
-        this.name = name;
+    public AdjacencyListCluster(int id) {
+        this.id = id;
         this.cluster = new HashSet<>();
     }
 
-    public AdjacencyListCluster(AdjacencyListCluster c1, AdjacencyListCluster c2) {
-        this.name = c1.getName() + " " + c2.getName();
+    public AdjacencyListCluster(int id, AdjacencyListCluster c1, AdjacencyListCluster c2) {
+        this.id = id;
         this.cluster = new HashSet<>(c1.getCluster());
         this.cluster.addAll(c2.getCluster());
     }
 
     public void add(AdjacencyListVertex item) {
         cluster.add(item);
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Set<AdjacencyListVertex> getCluster() {
@@ -76,6 +72,10 @@ public class AdjacencyListCluster {
         }
     }
 
+    public int getID() {
+        return id;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (AdjacencyListVertex v : cluster) {
@@ -90,12 +90,12 @@ public class AdjacencyListCluster {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AdjacencyListCluster cluster = (AdjacencyListCluster) o;
-        return name.equals(cluster.name);
+        return id.equals(((AdjacencyListCluster) o).getID());
 
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return id.hashCode();
     }
 }
