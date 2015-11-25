@@ -91,8 +91,9 @@ public class MCNAlgorithm {
             // print out the clusters
             for (AdjacencyListCluster cluster : clusters) {
                 for (Vertex vertex : cluster.getCluster()) {
-                    writer.print(" " + vertex.getName());
+                    writer.print(vertex.getName() + " ");
                 }
+                writer.println();
             }
 
         } catch (Exception e) {

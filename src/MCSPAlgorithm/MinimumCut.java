@@ -8,14 +8,13 @@ import MBSPLAlgorithm.MBSPLVertexVertexDistance;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.UnaryOperator;
 
 /**
  * Created by conner on 11/19/15.
  */
 public class MinimumCut {
 
-    private static double DENSITYTHRESHOLD = .1;
+    private static double DENSITY_THRESHOLD = .1;
 
     private AdjacencyMatrixGraph graph;
     private SortedSet<Cluster<AdjacencyMatrixVertex>> clusters;
@@ -44,15 +43,14 @@ public class MinimumCut {
     public void run() {
         List<MBSPLVertexVertexDistance> reverseDistances = new ArrayList<>(distances);
         Collections.reverse(reverseDistances);
+        Set<Cluster<AdjacencyMatrixVertex>> removeMe = new HashSet<>();
+        Set<Cluster<AdjacencyMatrixVertex>> addMe = new HashSet<>();
 
-        while (containsClusterUnderDensity()) {
-            System.out.print(clusters.size() + " ");
+//        while (containsClusterUnderDensity()) {
             // TODO Possibly Sort for speed. James is lazy.
             for(Cluster<AdjacencyMatrixVertex> cluster : clusters) {
-                System.out.print(cluster.getName() + " ");
                 // TODO Possibly add map to density.
-                if(getClusterDensity(cluster) < DENSITYTHRESHOLD) {
-                    System.out.print(cluster.getName() + "+ ");
+                if(getClusterDensity(cluster) < DENSITY_THRESHOLD) {
                     AdjacencyMatrixVertex vertex1 = null, vertex2 = null;
 
                     for(MBSPLVertexVertexDistance distance : reverseDistances) {
@@ -64,15 +62,17 @@ public class MinimumCut {
                     }
 
                     if(vertex1 != null && vertex2 != null) {
-                        System.out.print("Running Stoer Wagner");
-                        modifiedStoerWagner(cluster, vertex1, vertex2);
+                        modifiedStoerWagner(cluster, vertex1, vertex2, removeMe, addMe);
                     }
                 }
             }
-        }
+//        }
+
+        clusters.addAll(addMe);
+        clusters.removeAll(removeMe);
     }
 
-    private void modifiedStoerWagner(Cluster<AdjacencyMatrixVertex> cluster, AdjacencyMatrixVertex vertex1, AdjacencyMatrixVertex vertex2) {
+    private void modifiedStoerWagner(Cluster<AdjacencyMatrixVertex> cluster, AdjacencyMatrixVertex vertex1, AdjacencyMatrixVertex vertex2, Set<Cluster<AdjacencyMatrixVertex>> removeMe, Set<Cluster<AdjacencyMatrixVertex>> addMe) {
 
         Cluster<AdjacencyMatrixVertex> cluster1 = new Cluster<AdjacencyMatrixVertex>(clusterid+"");
         clusterid++;
@@ -96,7 +96,10 @@ public class MinimumCut {
         cluster.getCluster().remove(vertexn);
 
         // while cluster still has vertices
-        while(cluster.getCluster().size() > 0) {
+        boolean clusterChanged = true;
+        while(cluster.getCluster().size() > 1 && clusterChanged) {
+            int clusterSize = cluster.getCluster().size();
+            System.out.println("Cluster " + cluster.getName() + " " + cluster.getCluster().size());
             // Find greatest vertex weight and add to cluster.
             AdjacencyMatrixVertex currentMaxVertexCluster1 = null;
             int currentMaxWeightCluster1 = 0;
@@ -118,34 +121,40 @@ public class MinimumCut {
             }
 
             // if vertex is the same for both clusters check clustering coefficient
-            if(currentMaxVertexCluster1.compareTo(currentMaxVertexCluster2) == 0) {
-                cluster1.add(currentMaxVertexCluster1);
-                double cluster1Density = getClusterDensity(cluster1);
-
-                cluster2.add(currentMaxVertexCluster2);
-                double cluster2Density = getClusterDensity(cluster2);
-
-                if(cluster1Density > cluster2Density) {
-                    cluster2.getCluster().remove(currentMaxVertexCluster2);
-                } else {
-                    cluster1.getCluster().remove(currentMaxVertexCluster1);
-                }
-
-                cluster.getCluster().remove(currentMaxVertexCluster1);
-            } else {
-                if(currentMaxWeightCluster1 > currentMaxWeightCluster2) {
+            if (currentMaxVertexCluster1 != null && currentMaxVertexCluster2 != null) {
+                if (currentMaxVertexCluster1.compareTo(currentMaxVertexCluster2) == 0) {
                     cluster1.add(currentMaxVertexCluster1);
+                    double cluster1Density = getClusterDensity(cluster1);
+
+                    cluster2.add(currentMaxVertexCluster2);
+                    double cluster2Density = getClusterDensity(cluster2);
+
+                    if (cluster1Density > cluster2Density) {
+                        cluster2.getCluster().remove(currentMaxVertexCluster2);
+                    } else {
+                        cluster1.getCluster().remove(currentMaxVertexCluster1);
+                    }
+
                     cluster.getCluster().remove(currentMaxVertexCluster1);
                 } else {
-                    cluster2.add(currentMaxVertexCluster2);
-                    cluster.getCluster().remove(currentMaxVertexCluster2);
+                    if (currentMaxWeightCluster1 > currentMaxWeightCluster2) {
+                        cluster1.add(currentMaxVertexCluster1);
+                        cluster.getCluster().remove(currentMaxVertexCluster1);
+                    } else {
+                        cluster2.add(currentMaxVertexCluster2);
+                        cluster.getCluster().remove(currentMaxVertexCluster2);
+                    }
                 }
+            } else {
+                if (currentMaxVertexCluster1 != null) cluster1.getCluster().remove(currentMaxVertexCluster1);
+                if (currentMaxVertexCluster2 != null) cluster2.getCluster().remove(currentMaxVertexCluster2);
             }
+            if (clusterSize == cluster.getCluster().size()) clusterChanged = false;
         }
 
-        clusters.add(cluster1);
-        clusters.add(cluster2);
-        clusters.remove(cluster);
+        addMe.add(cluster1);
+        addMe.add(cluster2);
+        removeMe.add(cluster);
 
     }
 
@@ -168,7 +177,7 @@ public class MinimumCut {
 
     private boolean containsClusterUnderDensity() {
         for(Cluster<AdjacencyMatrixVertex> cluster : clusters) {
-            if(getClusterDensity(cluster) < DENSITYTHRESHOLD) {
+            if(getClusterDensity(cluster) < DENSITY_THRESHOLD) {
                 return true;
             }
         }
@@ -188,6 +197,10 @@ public class MinimumCut {
         }
 
         return (double)sum/(cluster.getCluster().size()*(cluster.getCluster().size()-1));
+    }
+
+    public Set<Cluster<AdjacencyMatrixVertex>> getClusters() {
+        return clusters;
     }
 
     @Override

@@ -23,6 +23,32 @@ public class GroundTruth {
         buildGroundTruth(truthFile);
     }
 
+    public double findFScoreWeightedL(Set<AdjacencyListCluster> clusters) {
+        if (clusters.size() < 1) return 0.0;
+
+        double scores = 0.0;
+
+        for (AdjacencyListCluster cluster : clusters) {
+            double score = findMaxFScoreL(cluster) * cluster.getCluster().size() / graph.getVertices().size();
+            scores += score;
+        }
+
+        return scores / clusters.size();
+    }
+
+    public double findFScoreWeightedM(Set<Cluster<AdjacencyMatrixVertex>> clusters) {
+        if (clusters.size() < 1) return 0.0;
+
+        double scores = 0.0;
+
+        for (Cluster<AdjacencyMatrixVertex> cluster : clusters) {
+            double score = findMaxFScoreM(cluster) * cluster.getCluster().size() / graph.getVertices().size();
+            scores += score;
+        }
+
+        return scores / clusters.size();
+    }
+
     public double findFScoreL(Set<AdjacencyListCluster> clusters) {
         if (clusters.size() < 1) return 0.0;
 
@@ -43,7 +69,6 @@ public class GroundTruth {
 
         for (Cluster<AdjacencyMatrixVertex> cluster : clusters) {
             double score = findMaxFScoreM(cluster);
-            System.out.println(cluster.getCluster().size() + " " + score);
             scores += score;
         }
 
